@@ -25,18 +25,15 @@ namespace Calc.Controllers
         public IActionResult Login([FromBody] UserModel login)
         {
             IActionResult response = Unauthorized();
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var user = AuthenticateUser(login);
 
-            var Sectoken = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-
-            var token = new JwtSecurityTokenHandler().WriteToken(Sectoken);
-            Result res = new Result() { result = token };
-            return Ok(res);
+            if (user != null)
+            {
+                var tokenString = GenerateJSONWebToken(user);
+                response = Ok(new { token = tokenString });
+            }
+           // Result res = new Result() { result = response };
+            return Ok(response);
             
         }
 
@@ -48,7 +45,6 @@ namespace Calc.Controllers
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Aud,_config["Jwt:Audience"]),
             new Claim(JwtRegisteredClaimNames.Iss,_config["Jwt:Issuer"])
         };
 
@@ -56,7 +52,7 @@ namespace Calc.Controllers
                 issuer: _config["Jwt:Issuer"],
                audience: _config["Jwt:Audience"],
                claims: claims,
-                expires: DateTime.Now.AddMinutes(1),
+                expires: DateTime.Now.AddMinutes(20),
                 signingCredentials: credentials
                 );
 
@@ -70,10 +66,11 @@ namespace Calc.Controllers
 
             //Validate the User Credentials
             //Demo Purpose, I have Passed HardCoded User Information
-            if (login.Username == "string")
+            if (login.Username == "user")
             {
                 user = new UserModel { Username = "user", EmailAddress = "calcUser@gmail.com" };
             }
+
             return user;
         }
     }
