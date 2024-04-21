@@ -1,3 +1,4 @@
+using Calc.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,52 +8,29 @@ namespace Calc.Controllers
     [ApiController]
     public class CalcController : ControllerBase
     {
-        
+
         [HttpPost("Calc")]
         [Authorize]
-        public async Task<IActionResult> Calc([FromBody] CalcModel model)
+        public  IActionResult Calc([FromBody] CalcModel model)
         {
+            string result = "";
             switch (Request.Headers["Operation"])
             {
-              case   "+":return Ok(model.value1 + model.value2);
-                    break;
+                case "+":
+                    result=(model.value1 + model.value2).ToString(); break;
                 case "-":
-                    return Ok(model.value1 - model.value2);
-                    break;
+                     result = (model.value1 - model.value2).ToString(); break;
                 case "*":
-                    return Ok(model.value1 * model.value2);
-                    break;
+                     result = (model.value1 * model.value2).ToString(); break;
                 case "/":
-                    return Ok(model.value1 / model.value2);
-                    break;
+                     result = (model.value1 / model.value2).ToString(); break;
                 default:
-                    return Ok("please insert operation");
+                     result = ("please insert operation"); break;
 
             }
-            return Ok(model.value1 + model.value2);
-        }
-        [HttpPost("Add")]
-        public async Task<IActionResult> Add( [FromBody]  CalcModel model)
-        {
-            return Ok( model.value1 + model.value2);
-        }
+            Result res =new Result() { result = result };
+            return Ok(res);
 
-        [HttpPost("Substract")]
-        public async Task<IActionResult> Substract([FromBody] CalcModel model)
-        {
-            return Ok(model.value1 - model.value2);
-        }
-
-        [HttpPost("Multiply")]
-        public async Task<IActionResult> Multiply([FromBody] CalcModel model)
-        {
-            return Ok(model.value1 * model.value2);
-        }
-
-        [HttpPost("Divide")]
-        public async Task<IActionResult> Divide([FromBody] CalcModel model)
-        {
-            return Ok(model.value1 / model.value2);
         }
        
 
@@ -63,20 +41,7 @@ namespace Calc.Controllers
             _logger = logger;
         }
 
-        //[HttpGet(Name = "GetWeatherForecast")]
-        //public IEnumerable<WeatherForecast> Get()
-        //{
-        //    return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        //    {
-        //        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-        //        TemperatureC = Random.Shared.Next(-20, 55),
-        //        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        //    })
-        //    .ToArray();
-        //}
+       
     }
-    public class CalcModel {
-        public int value1 { get; set; }
-        public int value2 { get; set; }
-    }
+   
 }

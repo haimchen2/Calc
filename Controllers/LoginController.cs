@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Calc.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -34,8 +35,9 @@ namespace Calc.Controllers
               signingCredentials: credentials);
 
             var token = new JwtSecurityTokenHandler().WriteToken(Sectoken);
-
-            return Ok(token);
+            Result res = new Result() { result = token };
+            return Ok(res);
+            
         }
 
         private string GenerateJSONWebToken(UserModel userInfo)
@@ -54,7 +56,7 @@ namespace Calc.Controllers
                 issuer: _config["Jwt:Issuer"],
                audience: _config["Jwt:Audience"],
                claims: claims,
-                expires: DateTime.Now.AddMonths(2),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: credentials
                 );
 
@@ -68,9 +70,9 @@ namespace Calc.Controllers
 
             //Validate the User Credentials
             //Demo Purpose, I have Passed HardCoded User Information
-            if (login.Username == "calcUser")
+            if (login.Username == "string")
             {
-                user = new UserModel { Username = "calcUser", EmailAddress = "calcUser@gmail.com" };
+                user = new UserModel { Username = "user", EmailAddress = "calcUser@gmail.com" };
             }
             return user;
         }
